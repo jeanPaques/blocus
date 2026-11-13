@@ -18,7 +18,9 @@ describe("examen blanc", () => {
     expect(chooseExamQuestions(selectQuestions(state, { sessionId: "janvier", subject: "Maths" }), 5)).toEqual(["a"]);
   });
   it("supports 5, 10, 20 or all questions without duplicates", () => {
-    const qs = Array.from({ length: 25 }, (_, i) => ({ ...state.questions[0], id: String(i) }));
+    const first = state.questions[0];
+    if (!first) throw new Error("Missing test question");
+    const qs = Array.from({ length: 25 }, (_, i) => ({ ...first, id: String(i) }));
     for (const count of [5, 10, 20, 25]) {
       const ids = chooseExamQuestions(qs, count);
       expect(ids).toHaveLength(count); expect(new Set(ids).size).toBe(count);

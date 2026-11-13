@@ -23,7 +23,7 @@ export interface AppState {
   sessions: Session[];
   questions: Question[];
   onboarded: boolean;
-  examAttempt?: ExamAttempt;
+  examAttempt?: ExamAttempt | undefined;
 }
 export interface Backup {
   at: number;

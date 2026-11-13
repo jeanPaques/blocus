@@ -7,7 +7,7 @@ import { useApp, setState, selectQuestions, type Result } from "@/lib/store";
 import { chooseExamQuestions, examRemaining, examScore, finishExam, saveExamResults, type ExamAttempt } from "@/lib/exam";
 
 export const Route = createFileRoute("/examen/$sessionId")({
-  validateSearch: (s: Record<string, unknown>): { matiere?: string } => typeof s["matiere"] === "string" ? { matiere: s["matiere"] } : {},
+  validateSearch: (s: Record<string, unknown>): { matiere?: string | undefined } => typeof s["matiere"] === "string" ? { matiere: s["matiere"] } : {},
   head: () => ({ meta: [
     { title: "Examen blanc chronométré – Blocus" },
     { name: "description", content: "Prépare ton examen blanc, rédige tes réponses et corrige-toi à la fin de l'épreuve." },
