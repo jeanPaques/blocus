@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, X, Eye, CloudCheck, ArrowLeft } from "lucide-react";
 import { useApp, autoOrder, grade, selectQuestions } from "@/lib/store";
 import { RichText } from "@/components/app/RichText";
+import { QuestionEditor } from "@/components/app/QuestionEditor";
 
 export const Route = createFileRoute("/reviser/$sessionId")({
   validateSearch: (s: Record<string, unknown>): { matiere?: string | undefined; session?: string | undefined } => ({
@@ -54,11 +55,12 @@ function Review() {
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement).tagName === "INPUT") return;
+      const target = e.target as HTMLElement;
+      if (target.closest("input, textarea, select, button, a, [contenteditable], [role=dialog]") || document.querySelector("[role=dialog]")) return;
       const k = e.key.toLowerCase();
       if (!shown && (k === " " || k === "enter")) { e.preventDefault(); setShown(true); }
       else if (shown && (k === "f" || k === "1")) answer("wrong");
-      else if (shown && (k === "v" || k === "2")) answer("right");
+      else if (shown && (k === "v" || k === "b" || k === "2")) answer("right");
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
@@ -93,7 +95,7 @@ function Review() {
       ) : (
         <>
           <article className="paper rounded-xl py-6 pl-16 pr-6">
-            <p className="text-sm uppercase tracking-wider text-muted-foreground leading-8">{sessionId === "erreurs" ? `${app.sessions.find((s) => s.id === q.sessionId)?.name ?? ""} · ` : ""}{q.subject}{q.seen === 0 ? " · nouvelle" : q.last === "wrong" ? " · à revoir" : ""}</p>
+            <div className="flex items-start justify-between gap-2"><p className="text-sm uppercase tracking-wider text-muted-foreground leading-8">{sessionId === "erreurs" ? `${app.sessions.find((s) => s.id === q.sessionId)?.name ?? ""} · ` : ""}{q.subject}{q.seen === 0 ? " · nouvelle" : q.last === "wrong" ? " · à revoir" : ""}</p><QuestionEditor key={q.id} question={q} /></div>
             <RichText text={q.question} className="font-serif text-xl md:text-2xl" />
             {shown && (
               <div className="mt-4 border-t-2 border-dashed pt-4 animate-in fade-in slide-in-from-bottom-2">

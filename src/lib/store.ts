@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import type { ExamAttempt } from "./exam";
 
 export type Result = "right" | "wrong";
 export interface Question {
@@ -22,6 +23,7 @@ export interface AppState {
   sessions: Session[];
   questions: Question[];
   onboarded: boolean;
+  examAttempt?: ExamAttempt;
 }
 export interface Backup {
   at: number;
@@ -162,6 +164,17 @@ export function grade(id: string, r: Result) {
       q.id === id ? { ...q, seen: q.seen + 1, last: r, right: q.right + (r === "right" ? 1 : 0), wrong: q.wrong + (r === "wrong" ? 1 : 0) } : q,
     ),
   }));
+}
+
+export function mastery(qs: Question[]) {
+  const right = qs.filter((q) => q.last === "right").length;
+  const wrong = qs.filter((q) => q.last === "wrong").length;
+  return { total: qs.length, right, wrong, unseen: qs.length - right - wrong, percent: qs.length ? Math.round(right / qs.length * 100) : 0 };
+}
+
+export function editQuestion(s: AppState, id: string, question: string, answer: string): AppState {
+  if (!question.trim() || !answer.trim()) return s;
+  return { ...s, questions: s.questions.map((q) => q.id === id ? { ...q, question: question.trim(), answer: answer.trim() } : q) };
 }
 
 export interface ParsedQ {
