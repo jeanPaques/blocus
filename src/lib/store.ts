@@ -120,8 +120,8 @@ export function autoOrder(qs: Question[]): Question[] {
 }
 
 export interface QuestionFilter {
-  sessionId?: string;
-  subject?: string;
+  sessionId?: string | undefined;
+  subject?: string | undefined;
   errorsOnly?: boolean;
 }
 

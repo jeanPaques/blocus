@@ -5,7 +5,7 @@ import { RichText } from "@/components/app/RichText";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/carnet")({
-  validateSearch: (s: Record<string, unknown>): { session?: string; matiere?: string } => ({
+  validateSearch: (s: Record<string, unknown>): { session?: string | undefined; matiere?: string | undefined } => ({
     ...(typeof s["session"] === "string" ? { session: s["session"] } : {}),
     ...(typeof s["matiere"] === "string" ? { matiere: s["matiere"] } : {}),
   }),

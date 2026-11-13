@@ -5,7 +5,7 @@ import { useApp, autoOrder, grade, selectQuestions } from "@/lib/store";
 import { RichText } from "@/components/app/RichText";
 
 export const Route = createFileRoute("/reviser/$sessionId")({
-  validateSearch: (s: Record<string, unknown>): { matiere?: string; session?: string } => ({
+  validateSearch: (s: Record<string, unknown>): { matiere?: string | undefined; session?: string | undefined } => ({
     ...(typeof s["matiere"] === "string" ? { matiere: s["matiere"] } : {}),
     ...(typeof s["session"] === "string" ? { session: s["session"] } : {}),
   }),
