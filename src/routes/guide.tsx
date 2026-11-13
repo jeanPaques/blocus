@@ -18,6 +18,8 @@ export const Route = createFileRoute("/guide")({
       { name: "description", content: "Guide pas à pas pour générer tes questions de révision avec ChatGPT ou Claude." },
       { property: "og:title", content: "Créer mes questions avec l'IA – Blocus" },
       { property: "og:description", content: "Copie le prompt magique, dépose ton cours, importe le résultat." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Guide,

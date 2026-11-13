@@ -1,17 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Check, X, Eye, CloudCheck, ArrowLeft } from "lucide-react";
-import { useApp, autoOrder, grade } from "@/lib/store";
+import { useApp, autoOrder, grade, selectQuestions } from "@/lib/store";
 import { RichText } from "@/components/app/RichText";
 
 export const Route = createFileRoute("/reviser/$sessionId")({
-  validateSearch: (s: Record<string, unknown>): { matiere?: string } => (typeof s["matiere"] === "string" ? { matiere: s["matiere"] as string } : {}),
+  validateSearch: (s: Record<string, unknown>): { matiere?: string; session?: string } => ({
+    ...(typeof s["matiere"] === "string" ? { matiere: s["matiere"] } : {}),
+    ...(typeof s["session"] === "string" ? { session: s["session"] } : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Révision – Blocus" },
       { name: "description", content: "Lis la question, affiche la réponse et évalue-toi." },
       { property: "og:title", content: "Révision – Blocus" },
       { property: "og:description", content: "Questions-réponses avec auto-évaluation." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Review,
@@ -19,18 +24,21 @@ export const Route = createFileRoute("/reviser/$sessionId")({
 
 function Review() {
   const { sessionId } = Route.useParams();
-  const { matiere } = Route.useSearch();
+  const { matiere, session: errorSession } = Route.useSearch();
   const app = useApp();
   const session = app.sessions.find((s) => s.id === sessionId);
-  const title = sessionId === "erreurs" ? "Carnet d'erreurs" : session?.name ?? "Session";
+  const title = sessionId === "erreurs" ? `Carnet d'erreurs${errorSession ? ` · ${app.sessions.find((s) => s.id === errorSession)?.name ?? "Session"}` : ""}` : session?.name ?? "Session";
 
   // Freeze the order at start so grading doesn't reshuffle the deck mid-session.
   const [ids, setIds] = useState<string[] | null>(null);
   useEffect(() => {
-    const pool = app.questions.filter((q) => (sessionId === "erreurs" ? q.wrong > 0 : q.sessionId === sessionId) && (!matiere || q.subject === matiere));
+    const pool = selectQuestions(app, { sessionId: sessionId === "erreurs" ? errorSession : sessionId, subject: matiere, errorsOnly: sessionId === "erreurs" });
     setIds(autoOrder(pool).map((q) => q.id));
+    setI(0);
+    setShown(false);
+    setScore({ right: 0, wrong: 0 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, matiere]);
+  }, [sessionId, matiere, errorSession]);
   const [i, setI] = useState(0);
   const [shown, setShown] = useState(false);
   const [score, setScore] = useState({ right: 0, wrong: 0 });
@@ -61,7 +69,7 @@ function Review() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link to="/" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft size={14} />Mes sessions</Link>
+      {sessionId === "erreurs" ? <Link to="/carnet" search={{ session: errorSession, matiere }} className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft size={14} />Carnet d'erreurs</Link> : <Link to="/" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft size={14} />Mes sessions</Link>}
       <div className="mb-3 flex items-baseline justify-between gap-4">
         <h1 className="text-2xl font-semibold">{title}{matiere ? ` · ${matiere}` : ""}</h1>
         <span className="text-sm tabular-nums text-muted-foreground">{Math.min(i + 1, total)} / {total}</span>
@@ -71,7 +79,7 @@ function Review() {
       {total === 0 ? (
         <div className="paper rounded-xl py-10 pl-16 pr-6">
           <p className="text-lg">Aucune question ici pour l'instant.</p>
-          <Link to="/importer" className="btn btn-primary mt-4">Ajouter des questions</Link>
+          <Link to="/importer" search={{ session: sessionId === "erreurs" ? errorSession : sessionId, matiere }} className="btn btn-primary mt-4">Ajouter des questions</Link>
         </div>
       ) : !q ? (
         <div className="paper rounded-xl py-10 pl-16 pr-6">
@@ -79,13 +87,13 @@ function Review() {
           <p className="mt-3 text-lg leading-8"><span className="text-success">{score.right} bonnes</span> · <span className="text-destructive">{score.wrong} à revoir</span></p>
           <div className="mt-6 flex flex-wrap gap-3">
             <button className="btn btn-primary" onClick={() => { setIds(autoOrder(app.questions.filter((x) => ids.includes(x.id))).map((x) => x.id)); setI(0); setScore({ right: 0, wrong: 0 }); }}>Recommencer</button>
-            <Link to="/carnet" className="btn btn-ghost">Voir mon carnet d'erreurs</Link>
+            <Link to="/carnet" search={{ session: sessionId === "erreurs" ? errorSession : sessionId, matiere }} className="btn btn-ghost">Voir mon carnet d'erreurs</Link>
           </div>
         </div>
       ) : (
         <>
           <article className="paper rounded-xl py-6 pl-16 pr-6">
-            <p className="text-sm uppercase tracking-wider text-muted-foreground leading-8">{q.subject}{q.seen === 0 ? " · nouvelle" : q.last === "wrong" ? " · à revoir" : ""}</p>
+            <p className="text-sm uppercase tracking-wider text-muted-foreground leading-8">{sessionId === "erreurs" ? `${app.sessions.find((s) => s.id === q.sessionId)?.name ?? ""} · ` : ""}{q.subject}{q.seen === 0 ? " · nouvelle" : q.last === "wrong" ? " · à revoir" : ""}</p>
             <RichText text={q.question} className="font-serif text-xl md:text-2xl" />
             {shown && (
               <div className="mt-4 border-t-2 border-dashed pt-4 animate-in fade-in slide-in-from-bottom-2">
