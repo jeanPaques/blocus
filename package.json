@@ -1,5 +1,16 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "blocus",
+  "version": "1.0.0",
+  "description": "Plateforme d'entraînement aux examens par révision active, 100 % locale.",
+  "license": "MIT",
+  "author": "Jean Paques",
+  "keywords": [
+    "education",
+    "exam-prep",
+    "flashcards",
+    "pwa",
+    "react"
+  ],
   "private": true,
   "sideEffects": false,
   "type": "module",
