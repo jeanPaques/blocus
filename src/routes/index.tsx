@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, Play, Trash2, History, X, FolderPlus } from "lucide-react";
-import { useApp, setState, uid, getBackups, restoreBackup, type Backup } from "@/lib/store";
+import { useApp, setState, uid, getBackups, restoreBackup, selectQuestions, sessionSubjects, type Backup } from "@/lib/store";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -10,6 +11,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Choisis ta session d'examen et révise en questions-réponses avec auto-évaluation." },
       { property: "og:title", content: "Mes sessions d'examen – Blocus" },
       { property: "og:description", content: "Révise tes examens BA1 Informatique ULB, sans compte, directement dans ton navigateur." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -86,8 +89,8 @@ function Home() {
 
       <div className="grid gap-5 md:grid-cols-2">
         {app.sessions.map((se) => {
-          const qs = app.questions.filter((q) => q.sessionId === se.id);
-          const subjects = Array.from(new Set([...se.subjects, ...qs.map((q) => q.subject)]));
+          const qs = selectQuestions(app, { sessionId: se.id });
+          const subjects = sessionSubjects(app, se.id);
           const mastered = qs.filter((q) => q.last === "right").length;
           return (
             <article key={se.id} className="paper rounded-xl py-5 pl-16 pr-5">
@@ -99,9 +102,12 @@ function Home() {
               <div className="h-1.5 overflow-hidden rounded bg-secondary"><div className="h-full bg-success" style={{ width: `${qs.length ? (mastered / qs.length) * 100 : 0}%` }} /></div>
               <ul className="mt-3 leading-8">
                 {subjects.map((m) => (
-                  <li key={m} className="flex items-center justify-between">
-                    <span>{m} <span className="text-sm text-muted-foreground">({qs.filter((q) => q.subject === m).length})</span></span>
-                    <Link to="/reviser/$sessionId" params={{ sessionId: se.id }} search={{ matiere: m }} className="text-sm text-primary hover:underline">Réviser</Link>
+                  <li key={m} className="flex flex-wrap items-center justify-between gap-x-3">
+                    <span className="min-w-0 break-words">{m} <span className="text-sm text-muted-foreground">({qs.filter((q) => q.subject === m).length})</span></span>
+                    <div className="flex gap-3">
+                      <Link to="/importer" search={{ session: se.id, matiere: m }} className="text-sm text-primary hover:underline">Importer</Link>
+                      <Link to="/reviser/$sessionId" params={{ sessionId: se.id }} search={{ matiere: m }} className="text-sm text-primary hover:underline">Réviser</Link>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -113,7 +119,11 @@ function Home() {
               ) : (
                 <button className="mt-1 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" onClick={() => { setAdding(se.id); setSubject(""); }}><FolderPlus size={14} />Ajouter une matière</button>
               )}
-              <Link to="/reviser/$sessionId" params={{ sessionId: se.id }} search={{}} className="btn btn-primary mt-4 w-full"><Play size={16} />Session automatique</Link>
+              <Button asChild className="btn btn-primary mt-4 h-auto w-full whitespace-normal"><Link to="/reviser/$sessionId" params={{ sessionId: se.id }} search={{}}><Play size={16} />Réviser toutes les matières</Link></Button>
+              <div className="mt-3 flex flex-wrap justify-between gap-2 text-sm">
+                <Link to="/importer" search={{ session: se.id }} className="text-primary hover:underline">Importer des questions</Link>
+                <Link to="/carnet" search={{ session: se.id }} className="text-primary hover:underline">Carnet d'erreurs</Link>
+              </div>
             </article>
           );
         })}
