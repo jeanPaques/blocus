@@ -3,6 +3,7 @@ import { Printer, Play } from "lucide-react";
 import { useApp, selectQuestions, sessionSubjects } from "@/lib/store";
 import { RichText } from "@/components/app/RichText";
 import { Button } from "@/components/ui/button";
+import { QuestionEditor } from "@/components/app/QuestionEditor";
 
 export const Route = createFileRoute("/carnet")({
   validateSearch: (s: Record<string, unknown>): { session?: string | undefined; matiere?: string | undefined } => ({
@@ -68,7 +69,7 @@ function Carnet() {
         <div className="space-y-5">
           {qs.map((q) => (
             <article key={q.id} className="paper print-card rounded-xl py-4 pl-16 pr-6">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground leading-8">{sessionName(q.sessionId)} · {q.subject} · ratée {q.wrong}×</p>
+              <div className="flex items-start justify-between gap-2"><p className="text-xs uppercase tracking-wider text-muted-foreground leading-8">{sessionName(q.sessionId)} · {q.subject} · ratée {q.wrong}×</p><QuestionEditor question={q} /></div>
               <RichText text={q.question} className="font-serif text-lg" />
               <div className="border-t border-dashed pt-2"><RichText text={q.answer} /></div>
             </article>

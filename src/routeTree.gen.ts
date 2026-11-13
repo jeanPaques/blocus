@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CarnetRouteImport } from './routes/carnet'
 import { Route as GuideRouteImport } from './routes/guide'
 import { Route as ImporterRouteImport } from './routes/importer'
+import { Route as ExamenSessionIdRouteImport } from './routes/examen.$sessionId'
 import { Route as ReviserSessionIdRouteImport } from './routes/reviser.$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -35,6 +36,11 @@ const ImporterRoute = ImporterRouteImport.update({
   path: '/importer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExamenSessionIdRoute = ExamenSessionIdRouteImport.update({
+  id: '/examen/$sessionId',
+  path: '/examen/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviserSessionIdRoute = ReviserSessionIdRouteImport.update({
   id: '/reviser/$sessionId',
   path: '/reviser/$sessionId',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/carnet': typeof CarnetRoute
   '/guide': typeof GuideRoute
   '/importer': typeof ImporterRoute
+  '/examen/$sessionId': typeof ExamenSessionIdRoute
   '/reviser/$sessionId': typeof ReviserSessionIdRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/carnet': typeof CarnetRoute
   '/guide': typeof GuideRoute
   '/importer': typeof ImporterRoute
+  '/examen/$sessionId': typeof ExamenSessionIdRoute
   '/reviser/$sessionId': typeof ReviserSessionIdRoute
 }
 export interface FileRoutesById {
@@ -61,19 +69,33 @@ export interface FileRoutesById {
   '/carnet': typeof CarnetRoute
   '/guide': typeof GuideRoute
   '/importer': typeof ImporterRoute
+  '/examen/$sessionId': typeof ExamenSessionIdRoute
   '/reviser/$sessionId': typeof ReviserSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/carnet' | '/guide' | '/importer' | '/reviser/$sessionId'
+  fullPaths:
+    | '/'
+    | '/carnet'
+    | '/guide'
+    | '/importer'
+    | '/examen/$sessionId'
+    | '/reviser/$sessionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/carnet' | '/guide' | '/importer' | '/reviser/$sessionId'
+  to:
+    | '/'
+    | '/carnet'
+    | '/guide'
+    | '/importer'
+    | '/examen/$sessionId'
+    | '/reviser/$sessionId'
   id:
     | '__root__'
     | '/'
     | '/carnet'
     | '/guide'
     | '/importer'
+    | '/examen/$sessionId'
     | '/reviser/$sessionId'
   fileRoutesById: FileRoutesById
 }
@@ -82,6 +104,7 @@ export interface RootRouteChildren {
   CarnetRoute: typeof CarnetRoute
   GuideRoute: typeof GuideRoute
   ImporterRoute: typeof ImporterRoute
+  ExamenSessionIdRoute: typeof ExamenSessionIdRoute
   ReviserSessionIdRoute: typeof ReviserSessionIdRoute
 }
 
@@ -115,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImporterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/examen/$sessionId': {
+      id: '/examen/$sessionId'
+      path: '/examen/$sessionId'
+      fullPath: '/examen/$sessionId'
+      preLoaderRoute: typeof ExamenSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reviser/$sessionId': {
       id: '/reviser/$sessionId'
       path: '/reviser/$sessionId'
@@ -130,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   CarnetRoute: CarnetRoute,
   GuideRoute: GuideRoute,
   ImporterRoute: ImporterRoute,
+  ExamenSessionIdRoute: ExamenSessionIdRoute,
   ReviserSessionIdRoute: ReviserSessionIdRoute,
 }
 export const routeTree = rootRouteImport

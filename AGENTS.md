@@ -32,3 +32,5 @@ use the editor.
 - App state lives in src/lib/store.ts (localStorage + 3 rolling restore points); pages read it via useApp() so no backend is needed.
 - Keep questions normalized by sessionId and subject; use shared selectors for review and the error notebook so filtered views never copy progress or questions.
 - Import into an existing session through the pure importQuestions helper; sharing deduplicates by session, subject and question so identical prompts in different subjects stay independent.
+- Store the optional active mock exam in AppState using question IDs, written answers and an absolute deadline; reloads resume the attempt without duplicating questions or resetting time.
+- Apply mock-exam grades in one idempotent batch after deferred self-correction; editing question text preserves identity, associations and grading history.
