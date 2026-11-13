@@ -119,6 +119,42 @@ export function autoOrder(qs: Question[]): Question[] {
   return [...unseen, ...failed, ...mastered];
 }
 
+export interface QuestionFilter {
+  sessionId?: string;
+  subject?: string;
+  errorsOnly?: boolean;
+}
+
+/** A view of the original questions, never a separate error collection. */
+export function selectQuestions(s: AppState, filter: QuestionFilter = {}): Question[] {
+  return s.questions.filter((q) =>
+    (!filter.sessionId || q.sessionId === filter.sessionId) &&
+    (!filter.subject || q.subject === filter.subject) &&
+    (!filter.errorsOnly || q.wrong > 0),
+  );
+}
+
+export function sessionSubjects(s: AppState, sessionId: string): string[] {
+  const session = s.sessions.find((x) => x.id === sessionId);
+  if (!session) return [];
+  return Array.from(new Set([...session.subjects, ...selectQuestions(s, { sessionId }).map((q) => q.subject)]));
+}
+
+/** A chosen subject overrides text labels; omitted subject preserves multi-subject imports. */
+export function importQuestions(s: AppState, sessionId: string, parsed: ParsedQ[], subject?: string): AppState {
+  if (!s.sessions.some((x) => x.id === sessionId)) return s;
+  const questions = parsed.map((q) => ({
+    ...q, subject: subject?.trim() || q.subject, sessionId, id: uid(), seen: 0, right: 0, wrong: 0,
+  }));
+  return {
+    ...s,
+    sessions: s.sessions.map((x) => x.id === sessionId
+      ? { ...x, subjects: Array.from(new Set([...x.subjects, ...questions.map((q) => q.subject)])) }
+      : x),
+    questions: [...s.questions, ...questions],
+  };
+}
+
 export function grade(id: string, r: Result) {
   setState((s) => ({
     ...s,
@@ -150,7 +186,7 @@ export function parseImport(text: string): ParsedQ[] {
     } else if (h.startsWith("question")) {
       cur = { subject, question: body };
     } else if (h.startsWith("r") && cur?.question) {
-      out.push({ subject: cur.subject!, question: cur.question, answer: body });
+      out.push({ subject: cur.subject ?? subject, question: cur.question, answer: body });
       cur = null;
     }
   }
@@ -178,7 +214,7 @@ export function buildShare(s: AppState): ShareFile {
 /** Merges a friend's file: same-name sessions are reused, duplicate questions skipped, progress untouched. */
 export function mergeShare(s: AppState, f: ShareFile): { state: AppState; added: number } {
   let added = 0;
-  const sessions = [...s.sessions];
+  const sessions = s.sessions.map((se) => ({ ...se, subjects: [...se.subjects] }));
   const questions = [...s.questions];
   for (const fs of f.sessions) {
     let se = sessions.find((x) => x.name === fs.name);
@@ -189,7 +225,7 @@ export function mergeShare(s: AppState, f: ShareFile): { state: AppState; added:
     const target = se;
     target.subjects = Array.from(new Set([...target.subjects, ...fs.subjects, ...fs.questions.map((q) => q.subject)]));
     for (const q of fs.questions) {
-      if (questions.some((x) => x.sessionId === target.id && x.question === q.question)) continue;
+      if (questions.some((x) => x.sessionId === target.id && x.subject === q.subject && x.question === q.question)) continue;
       questions.push({ ...q, id: uid(), sessionId: target.id, seen: 0, right: 0, wrong: 0 });
       added++;
     }

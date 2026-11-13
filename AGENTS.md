@@ -30,3 +30,5 @@ use the editor.
 <!-- LOVABLE:END -->
 
 - App state lives in src/lib/store.ts (localStorage + 3 rolling restore points); pages read it via useApp() so no backend is needed.
+- Keep questions normalized by sessionId and subject; use shared selectors for review and the error notebook so filtered views never copy progress or questions.
+- Import into an existing session through the pure importQuestions helper; sharing deduplicates by session, subject and question so identical prompts in different subjects stay independent.
