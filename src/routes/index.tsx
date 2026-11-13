@@ -68,6 +68,7 @@ function Home() {
         <div>
           <h2 className="text-4xl font-semibold">Mes sessions d'examen</h2>
           <p className="text-muted-foreground">Sessions → matières → questions.</p>
+          <Mastery questions={app.questions} />
         </div>
         <button className="btn btn-ghost text-sm" onClick={() => setBackups(getBackups())}><History size={15} />Revenir en arrière</button>
       </div>

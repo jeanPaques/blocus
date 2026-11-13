@@ -5,7 +5,7 @@
 - [x] Vérifier les règles et les parcours complets (15 tests et parcours sur ordinateur/téléphone).
 
 # Améliorations du blocus
-- [ ] Ajouter un examen blanc configurable, chronométré, avec correction différée et note sur 20.
-- [ ] Afficher la maîtrise par session et matière.
-- [ ] Modifier les questions depuis les révisions et le carnet sans perdre leur progression.
-- [ ] Tester les règles et les parcours sur ordinateur et téléphone.
+- [x] Ajouter un examen blanc configurable, chronométré, avec correction différée et note sur 20.
+- [x] Afficher la maîtrise globale, par session et matière.
+- [x] Modifier les questions depuis les révisions et le carnet sans perdre leur progression.
+- [x] Tester les règles et les parcours sur ordinateur et téléphone (26 tests, examen complet et fin du chrono).
