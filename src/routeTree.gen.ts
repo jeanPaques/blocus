@@ -10,33 +10,79 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CarnetRouteImport } from './routes/carnet'
+import { Route as GuideRouteImport } from './routes/guide'
+import { Route as ImporterRouteImport } from './routes/importer'
+import { Route as ReviserSessionIdRouteImport } from './routes/reviser.$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CarnetRoute = CarnetRouteImport.update({
+  id: '/carnet',
+  path: '/carnet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuideRoute = GuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImporterRoute = ImporterRouteImport.update({
+  id: '/importer',
+  path: '/importer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviserSessionIdRoute = ReviserSessionIdRouteImport.update({
+  id: '/reviser/$sessionId',
+  path: '/reviser/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/carnet': typeof CarnetRoute
+  '/guide': typeof GuideRoute
+  '/importer': typeof ImporterRoute
+  '/reviser/$sessionId': typeof ReviserSessionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/carnet': typeof CarnetRoute
+  '/guide': typeof GuideRoute
+  '/importer': typeof ImporterRoute
+  '/reviser/$sessionId': typeof ReviserSessionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/carnet': typeof CarnetRoute
+  '/guide': typeof GuideRoute
+  '/importer': typeof ImporterRoute
+  '/reviser/$sessionId': typeof ReviserSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/carnet' | '/guide' | '/importer' | '/reviser/$sessionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/carnet' | '/guide' | '/importer' | '/reviser/$sessionId'
+  id:
+    | '__root__'
+    | '/'
+    | '/carnet'
+    | '/guide'
+    | '/importer'
+    | '/reviser/$sessionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CarnetRoute: typeof CarnetRoute
+  GuideRoute: typeof GuideRoute
+  ImporterRoute: typeof ImporterRoute
+  ReviserSessionIdRoute: typeof ReviserSessionIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +94,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/carnet': {
+      id: '/carnet'
+      path: '/carnet'
+      fullPath: '/carnet'
+      preLoaderRoute: typeof CarnetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guide': {
+      id: '/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof GuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/importer': {
+      id: '/importer'
+      path: '/importer'
+      fullPath: '/importer'
+      preLoaderRoute: typeof ImporterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reviser/$sessionId': {
+      id: '/reviser/$sessionId'
+      path: '/reviser/$sessionId'
+      fullPath: '/reviser/$sessionId'
+      preLoaderRoute: typeof ReviserSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CarnetRoute: CarnetRoute,
+  GuideRoute: GuideRoute,
+  ImporterRoute: ImporterRoute,
+  ReviserSessionIdRoute: ReviserSessionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

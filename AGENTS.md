@@ -28,3 +28,5 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- App state lives in src/lib/store.ts (localStorage + 3 rolling restore points); pages read it via useApp() so no backend is needed.
