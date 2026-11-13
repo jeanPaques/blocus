@@ -23,7 +23,7 @@ export function renderRich(src: string): string {
     const m = b.match(/^```([\w+-]*)\n([\s\S]*?)```$/);
     if (m) {
       const lang = m[1] && hljs.getLanguage(m[1]) ? m[1] : "python";
-      return `<pre><code class="hljs">${hljs.highlight(m[2].replace(/\n$/, ""), { language: lang }).value}</code></pre>`;
+      return `<pre><code class="hljs">${hljs.highlight((m[2] ?? "").replace(/\n$/, ""), { language: lang }).value}</code></pre>`;
     }
     return b.split(/\n{2,}/).filter((p) => p.trim()).map((p) => `<p>${inline(p.trim()).replace(/\n/g, "<br/>")}</p>`).join("");
   }).join("");
