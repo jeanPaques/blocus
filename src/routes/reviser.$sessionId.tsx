@@ -5,7 +5,7 @@ import { useApp, autoOrder, grade } from "@/lib/store";
 import { RichText } from "@/components/app/RichText";
 
 export const Route = createFileRoute("/reviser/$sessionId")({
-  validateSearch: (s: Record<string, unknown>): { matiere?: string } => (typeof s.matiere === "string" ? { matiere: s.matiere } : {}),
+  validateSearch: (s: Record<string, unknown>): { matiere?: string } => (typeof s["matiere"] === "string" ? { matiere: s["matiere"] as string } : {}),
   head: () => ({
     meta: [
       { title: "Révision – Blocus" },
